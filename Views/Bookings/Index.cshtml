@@ -1,0 +1,79 @@
+﻿@model IEnumerable<CldvPOEnew.Models.Booking>
+
+@{
+    ViewData["Title"] = "Bookings";
+    var selectedEventTypeId = Context.Request.Query["eventTypeId"];
+    var selectedAvailability = Context.Request.Query["isAvailable"];
+    var startDate = Context.Request.Query["startDate"];
+    var endDate = Context.Request.Query["endDate"];
+    var searchString = Context.Request.Query["searchString"];
+}
+
+<h2>Bookings</h2>
+
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" name="searchString" class="form-control" 
+               placeholder="Search Booking ID or Event Name" 
+               value="@searchString" />
+    </div>
+    
+    <div class="col-md-2">
+        <select name="eventTypeId" class="form-select">
+            <option value="">All Event Types</option>
+            @foreach (var type in (SelectList)ViewData["EventTypeId"])
+            {
+                var selectedAttr = selectedEventTypeId == type.Value ? "selected" : "";
+                <option value="@type.Value">@Html.Raw(selectedAttr)@type.Text</option>
+            }
+
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <input type="date" name="startDate" class="form-control" value="@startDate" />
+    </div>
+
+    <div class="col-md-2">
+        <input type="date" name="endDate" class="form-control" value="@endDate" />
+    </div>
+
+    <div class="col-md-2">
+        <select name="isAvailable" class="form-select">
+            <option value="">All Availability</option>
+            <option value="true">@Html.Raw(selectedAvailability == "true" ? "selected" : "")Available</option>
+            <option value="false">@Html.Raw(selectedAvailability == "false" ? "selected" : "")Unavailable</option>
+
+        </select>
+    </div>
+
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Booking ID</th>
+            <th>Event Name</th>
+            <th>Event Type</th>
+            <th>Booking Date</th>
+            <th>Venue Name</th>
+            <th>Availability</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var booking in Model)
+        {
+            <tr>
+                <td>@booking.BookingId</td>
+                <td>@booking.Event?.EventName</td>
+                <td>@booking.Event?.EventType?.Name</td>
+                <td>@booking.BookingDate.ToString("yyyy-MM-dd")</td>
+                <td>@booking.Venue?.VenueName</td>
+                <td>@(booking.Venue?.IsAvailable == true ? "Available" : "Unavailable")</td>
+            </tr>
+        }
+    </tbody>
+</table>
